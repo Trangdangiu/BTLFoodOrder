@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".user.MainUser">
+
+    <AutoCompleteTextView
+        android:id="@+id/search_items"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:dropDownHeight="wrap_content"
+        android:dropDownVerticalOffset="4dp"
+        android:hint="Tìm kiếm món ăn "
+        android:padding="8dp"
+        android:textColor="#F4511E"
+        android:textColorHighlight="#F4511E"
+        android:textColorHint="#F4511E"
+        android:textSize="16sp"
+        android:background="@drawable/edit_search_home"
+        android:layout_margin="10dp"
+        android:singleLine="true"
+        android:maxLines="1"
+        android:drawableEnd="@drawable/ic_filter"
+        />
+
+   <androidx.viewpager2.widget.ViewPager2
+       android:id="@+id/image_viewpager"
+       android:layout_width="match_parent"
+       android:layout_height="150dp"
+       android:layout_gravity="center"
+       />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:text="Gợi ý món ăn "
+        android:textColor="#F4511E"
+        android:textSize="18sp"
+        android:padding="5dp"
+        android:textStyle="bold" />
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerViewFood"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+       android:layout_margin="12dp"
+        />
+
+</LinearLayout>
