@@ -56,4 +56,5 @@
     <string name="txtdangnhap">Đăng Nhập</string>
     <string name="txt_quenmatkhau">Quên Mật Khẩu ?</string>
     <string name="txt_chuacotaikhoan">Chưa có tài khoản ?</string>
+    <string name="btn_delete">Xóa</string>
 </resources>

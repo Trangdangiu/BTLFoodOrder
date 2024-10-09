@@ -1,28 +1,29 @@
 package com.example.testbotom.LoginAndRegister;
 
+import static com.example.testbotom.user.OtpGenerator.generateOtp;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 import com.example.testbotom.Database.Create_database;
 import com.example.testbotom.R;
+import com.example.testbotom.user.SendEmailTask;
 
 public class RegisterActivity extends AppCompatActivity {
     private Create_database dbHelper;
     private EditText editTextEmail, editTextPassword;
     private RadioGroup radioGroupRole;
+    private ImageView img_forgot_pass;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -38,6 +39,7 @@ public class RegisterActivity extends AppCompatActivity {
             String email = editTextEmail.getText().toString();
             String password = editTextPassword.getText().toString();
 
+
             // Kiểm tra người dùng đã chọn vai trò
             int selectedId = radioGroupRole.getCheckedRadioButtonId();
             if (selectedId == -1) {
@@ -50,8 +52,8 @@ public class RegisterActivity extends AppCompatActivity {
 
             if (dbHelper.registerUser(email, password, role)) {
                 Toast.makeText(RegisterActivity.this, "Đăng kí thành công", Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(RegisterActivity.this, LogginActivity.class);
-                startActivity(intent);
+                Intent intent1 = new Intent(RegisterActivity.this, LogginActivity.class);
+                startActivity(intent1);
                 finish(); // Đóng Activity đăng ký
             } else {
                 Log.e("RegisterError", "Đăng ký thất bại cho username: " + email);

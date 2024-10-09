@@ -13,7 +13,7 @@
     android:contentDescription="Quay lại" />
 
     <TextView
-        android:id="@+id/textView2"
+        android:id="@+id/img_forgot_pass"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_weight="1" />

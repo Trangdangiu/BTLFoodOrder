@@ -53,6 +53,9 @@ dependencies {
     implementation (libs.viewpager2)
     implementation (libs.material.v180)
 
+    implementation("com.sun.mail:android-activation:1.6.2")
+    implementation("com.sun.mail:android-mail:1.6.2")
+
     implementation("com.github.bumptech.glide:glide:4.15.0")
     annotationProcessor ("com.github.bumptech.glide:compiler:4.15.0")
 

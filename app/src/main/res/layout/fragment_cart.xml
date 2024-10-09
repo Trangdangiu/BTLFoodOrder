@@ -6,49 +6,39 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".user.CartFragment">
 
-<!--    <com.google.android.material.appbar.AppBarLayout-->
-<!--        android:id="@+id/app_bar_layout"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="wrap_content">-->
-
-<!--        <androidx.appcompat.widget.Toolbar-->
-<!--            style="@style/Foxandroid.Toolbar"-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="?actionBarSize"-->
-<!--            app:navigationIcon="@drawable/ic_backactivity"-->
-<!--            app:title="Giỏ Hàng" />-->
-
-<!--        &lt;!&ndash;        <TextView&ndash;&gt;-->
-<!--&lt;!&ndash;            android:id="@+id/textView8"&ndash;&gt;-->
-<!--&lt;!&ndash;            android:layout_width="match_parent"&ndash;&gt;-->
-<!--&lt;!&ndash;            android:layout_height="40dp"&ndash;&gt;-->
-<!--&lt;!&ndash;            android:text="Giỏ hàng"&ndash;&gt;-->
-<!--&lt;!&ndash;            android:textColor="@color/white"&ndash;&gt;-->
-<!--&lt;!&ndash;            android:textSize="16sp" />&ndash;&gt;-->
-
-
-<!--    </com.google.android.material.appbar.AppBarLayout>-->
-
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="15dp"
-        android:orientation="horizontal">
+        android:orientation="vertical">
 
-        <ImageView
-            android:id="@+id/img_back"
-            android:layout_width="50dp"
-            android:layout_height="25dp"
-            android:src="@drawable/ic_backactivity" />
 
-        <TextView
-            android:id="@+id/textView11"
+        <ListView
+            android:id="@+id/lv_cart"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center"
-            android:text="Giỏ Hàng"
-            android:textSize="16sp" />
-    </LinearLayout>
+            android:orientation="horizontal"
+            android:layout_gravity="bottom">
 
+            <TextView
+                android:id="@+id/textViewTotalPrice"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="Tổng tiền: 0 VND"
+                android:textSize="18sp" />
+
+            <Button
+                android:id="@+id/buttonCheckout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Thanh toán" />
+        </LinearLayout>
+
+    </LinearLayout>
 </FrameLayout>

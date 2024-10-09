@@ -16,6 +16,9 @@
         android:theme="@style/Theme.Testbotom"
         tools:targetApi="31">
         <activity
+            android:name=".user.OTPVerification"
+            android:exported="false" />
+        <activity
             android:name=".user.Food_detail"
             android:exported="false" />
         <activity
