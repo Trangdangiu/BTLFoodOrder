@@ -1,0 +1,15 @@
+<!-- res/drawable/rounded_button.xml -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_pressed="true">
+        <shape android:shape="rectangle">
+            <solid android:color="#B0B0B0"/> <!-- Màu xám khi nhấn -->
+            <corners android:radius="0dp"/> <!-- Không bo góc -->
+        </shape>
+    </item>
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="#808080"/> <!-- Màu xám khi không nhấn -->
+            <corners android:radius="10dp"/> <!-- Không bo góc -->
+        </shape>
+    </item>
+</selector>
