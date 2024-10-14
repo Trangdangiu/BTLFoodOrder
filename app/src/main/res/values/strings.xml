@@ -7,7 +7,11 @@
     <string name="second_fragment_label">Second Fragment</string>
     <string name="next">Next</string>
     <string name="previous">Previous</string>
-
+    <string-array name="payment_methods">
+        <item>Chuyển khoản ngân hàng</item>
+        <item>Thanh toán khi nhận hàng</item>
+        <item>Thẻ tín dụng</item>
+    </string-array>
     <string name="lorem_ipsum">
         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam in scelerisque sem. Mauris
         volutpat, dolor id interdum ullamcorper, risus dolor egestas lectus, sit amet mattis purus
@@ -57,4 +61,8 @@
     <string name="txt_quenmatkhau">Quên Mật Khẩu ?</string>
     <string name="txt_chuacotaikhoan">Chưa có tài khoản ?</string>
     <string name="btn_delete">Xóa</string>
+    <string name="txt_chitietdonhang">Chi Tiết Đơn Hàng</string>
+    <string name="txt_hoten">Họ Tên</string>
+    <string name="txt_giaohang">Nhập địa chỉ giao hàng</string>
+    <string name="enter_fullname">Nhập họ tên</string>
 </resources>

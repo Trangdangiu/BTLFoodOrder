@@ -53,26 +53,9 @@ public class Food_detail extends AppCompatActivity {
             }
         });
 
-
-        // Lấy dữ liệu từ Intent
-//        String name = getIntent().getStringExtra("foodName");
-//        int price = getIntent().getIntExtra("foodPrice", 0);
-//        String imageUri = getIntent().getStringExtra("foodImage"); // Nhận URI ảnh dưới dạng String
-//        String description = getIntent().getStringExtra("foodDescription");
-//
-//        // Set dữ liệu vào view
-//        foodName.setText(name);
-//        foodPrice.setText("Giá:  " + String.valueOf(price) + "VNĐ");
-//        foodDescription.setText(description);
-//
-//        // Load ảnh từ URI bằng Glide
-//        Glide.with(this)
-//                .load(Uri.parse(imageUri)) // Chuyển đổi lại từ String sang Uri
-//                .placeholder(R.drawable.anh1)
-//                .error(R.drawable.ic_home)
-//                .into(foodImage);
         loaddataFood();
     }
+
 
 
     private void showAddToCartDialog(String name, int price,String image) {
@@ -85,7 +68,7 @@ public class Food_detail extends AppCompatActivity {
         EditText quantityInput = dialogView.findViewById(R.id.quantity_input); // soluong
         Button addButton = dialogView.findViewById(R.id.add_button);
         Button cancelButton = dialogView.findViewById(R.id.cancel_button);
-        // hieenj ảnh
+        //
         txt_name.setText(name);
         txt_price.setText(price+" VNĐ");
         Glide.with(this)
@@ -109,11 +92,10 @@ public class Food_detail extends AppCompatActivity {
 
         dialog.show();
     }
-
+    // ham goi contruct de add du lieu vao database
     private void addToCart(String name, double price, int quantity, String image) {
         int cartId = 1; // Thay đổi giá trị này theo giỏ hàng hiện tại
         int foodId = getIntent().getIntExtra("foodId", 0);
-
         CartItem cartItem = new CartItem(0, cartId, foodId, name, price, image, quantity);
 
         Create_database db = new Create_database(this);

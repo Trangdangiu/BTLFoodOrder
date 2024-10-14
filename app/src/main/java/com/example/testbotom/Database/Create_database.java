@@ -76,9 +76,9 @@ public class Create_database extends SQLiteOpenHelper {
 
         // Tạo bảng chi tiết đơn hàng
         String CREATE_ORDER_ITEMS_TABLE = "CREATE TABLE " + TABLE_ORDER_ITEMS +
-                "(order_item_id INTEGER PRIMARY KEY AUTOINCREMENT, order_id INTEGER, food_id INTEGER, quantity INTEGER, " +
-                "FOREIGN KEY (order_id) REFERENCES " + TABLE_ORDERS + "(order_id), " +
-                "FOREIGN KEY (food_id) REFERENCES " + TABLE_FOOD + "(id))";
+                "(order_item_id INTEGER PRIMARY KEY AUTOINCREMENT, order_code TEXT, full_name TEXT, phone_number TEXT, " +
+                "address TEXT, menu TEXT, order_date DATETIME, total_amount REAL, payment_method TEXT, " +
+                "FOREIGN KEY (order_code) REFERENCES " + TABLE_ORDERS + "(order_id))";
         db.execSQL(CREATE_ORDER_ITEMS_TABLE);
     }
 
@@ -278,12 +278,31 @@ public class Create_database extends SQLiteOpenHelper {
         return result > 0;  // Trả về true nếu cập nhật thành công
     }
 
+
+    @SuppressLint("Range")
+    public int getCartIdByUserId(int userId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.query(TABLE_CART, new String[]{"cart_id"}, "user_id = ?", new String[]{String.valueOf(userId)}, null, null, null);
+        int cartId = -1; // Giá trị mặc định nếu không tìm thấy giỏ hàng
+        if (cursor != null && cursor.moveToFirst()) {
+            cartId = cursor.getInt(cursor.getColumnIndex("cart_id"));
+        }
+        if (cursor != null) {
+            cursor.close();
+        }
+        db.close();
+        return cartId; // Trả về cart_id hoặc -1 nếu không tìm thấy
+    }
+
+
     // Thêm vào Create_database.java
 
+    // Lấy tất cả các mục trong giỏ hàng dựa trên cartId
     public List<CartItem> getAllCartItems(int cartId) {
         List<CartItem> cartItems = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
 
+        // Truy vấn tất cả các mục trong giỏ hàng với cartId nhất định
         Cursor cursor = db.query("cart_items", null, "cart_id = ?", new String[]{String.valueOf(cartId)}, null, null, null);
         if (cursor != null && cursor.moveToFirst()) {
             do {
@@ -294,6 +313,7 @@ public class Create_database extends SQLiteOpenHelper {
                 @SuppressLint("Range") String foodImage = cursor.getString(cursor.getColumnIndex("food_image"));
                 @SuppressLint("Range") int quantity = cursor.getInt(cursor.getColumnIndex("quantity"));
 
+                // Khởi tạo đối tượng CartItem
                 CartItem item = new CartItem(cartItemId, cartId, foodId, foodName, foodPrice, foodImage, quantity);
                 cartItems.add(item);
             } while (cursor.moveToNext());
@@ -302,9 +322,102 @@ public class Create_database extends SQLiteOpenHelper {
             cursor.close();
         }
         db.close();
-        return cartItems;
+        return cartItems; // Trả về danh sách các mục trong giỏ hàng
     }
 
+
+    public void deleteCartItem(int id) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(TABLE_CART_ITEMS, "cart_item_id = ?", new String[]{String.valueOf(id)});
+        db.close();
+    }
+// update khi thay doi sluong item_food_cart
+    public void updateCartItemQuantity(int cartItemId, int newQuantity) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("quantity", newQuantity);
+
+        db.update(TABLE_CART_ITEMS, values, "cart_item_id = ?", new String[]{String.valueOf(cartItemId)});
+        db.close(); // Closing the database connection
+    }
+
+
+    public long addOrderItem(OrderItem orderItem) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("order_code", orderItem.getOrderCode());
+        values.put("full_name", orderItem.getFullName());
+        values.put("phone_number", orderItem.getPhoneNumber());
+        values.put("address", orderItem.getAddress());
+        values.put("menu", orderItem.getMenu());
+        values.put("order_date", orderItem.getOrderDate());
+        values.put("total_amount", orderItem.getTotalAmount());
+        values.put("payment_method", orderItem.getPaymentMethod());
+
+        // Chèn hàng vào bảng
+        long result = db.insert(TABLE_ORDER_ITEMS, null, values);
+        db.close();
+        return result;
+    }
+
+
+
+    public List<OrderItem> getAllOrderItems() {
+        List<OrderItem> orderItemList = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_ORDER_ITEMS, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                @SuppressLint("Range") OrderItem orderItem = new OrderItem(
+                        cursor.getInt(cursor.getColumnIndex("order_item_id")),
+                        cursor.getString(cursor.getColumnIndex("order_code")),
+                        cursor.getString(cursor.getColumnIndex("full_name")),
+                        cursor.getString(cursor.getColumnIndex("phone_number")),
+                        cursor.getString(cursor.getColumnIndex("address")),
+                        cursor.getString(cursor.getColumnIndex("menu")),
+                        cursor.getString(cursor.getColumnIndex("order_date")),
+                        cursor.getDouble(cursor.getColumnIndex("total_amount")),
+                        cursor.getString(cursor.getColumnIndex("payment_method"))
+                );
+                orderItemList.add(orderItem);
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+        db.close();
+        return orderItemList;
+    }
+// load theo ngay
+    public List<OrderItem> getOrderItemsByDate(String startDate, String endDate) {
+        List<OrderItem> orderItemList = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        // Giả sử định dạng ngày là "dd/MM/yyyy", bạn cần định dạng lại để phù hợp với CSDL
+        String query = "SELECT * FROM " + TABLE_ORDER_ITEMS + " WHERE order_date BETWEEN ? AND ?";
+        Cursor cursor = db.rawQuery(query, new String[]{startDate, endDate});
+
+        if (cursor.moveToFirst()) {
+            do {
+                @SuppressLint("Range") OrderItem orderItem = new OrderItem(
+                        cursor.getInt(cursor.getColumnIndex("order_item_id")),
+                        cursor.getString(cursor.getColumnIndex("order_code")),
+                        cursor.getString(cursor.getColumnIndex("full_name")),
+                        cursor.getString(cursor.getColumnIndex("phone_number")),
+                        cursor.getString(cursor.getColumnIndex("address")),
+                        cursor.getString(cursor.getColumnIndex("menu")),
+                        cursor.getString(cursor.getColumnIndex("order_date")),
+                        cursor.getDouble(cursor.getColumnIndex("total_amount")),
+                        cursor.getString(cursor.getColumnIndex("payment_method"))
+                );
+                orderItemList.add(orderItem);
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+        db.close();
+        return orderItemList;
+    }
 
 
 

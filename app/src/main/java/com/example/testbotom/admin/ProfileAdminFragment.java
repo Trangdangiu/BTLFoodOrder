@@ -31,12 +31,20 @@ public class ProfileAdminFragment extends Fragment {
         txt_change_pass=view.findViewById(R.id.txt_changepass_admin);
         txt_logout=view.findViewById(R.id.txt_logout_admin);
         database = new Create_database(getContext());
-
+        txt_revenue.setOnClickListener(v -> {
+            showRevenue();
+        });
         txt_logout.setOnClickListener(view1 -> logout());
 
         txt_change_pass.setOnClickListener(view2 -> ShowChangePasswordDialog());
 
         return view;
+    }
+
+
+    private void showRevenue(){
+        Intent intent = new Intent(getContext(), Revenue.class);
+        startActivity(intent);
     }
 
     private void ShowChangePasswordDialog(){

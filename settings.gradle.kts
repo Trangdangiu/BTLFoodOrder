@@ -7,8 +7,11 @@ pluginManagement {
                 includeGroupByRegex("androidx.*")
             }
         }
+        maven("https://jitpack.io")
         mavenCentral()
         gradlePluginPortal()
+
+
     }
 }
 dependencyResolutionManagement {
@@ -16,9 +19,9 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        maven("https://jitpack.io")
     }
 }
 
 rootProject.name = "Testbotom"
 include(":app")
- 

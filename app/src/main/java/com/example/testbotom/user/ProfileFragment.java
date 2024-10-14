@@ -4,8 +4,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,6 +23,7 @@ import com.example.testbotom.R;
 public class ProfileFragment extends Fragment {
     TextView txt_history_order, txt_change_pass, txt_logout;
     private Create_database database;
+    private TextView txt_profile_user;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -29,12 +32,24 @@ public class ProfileFragment extends Fragment {
         txt_change_pass = view.findViewById(R.id.txt_change_pass);
         txt_logout = view.findViewById(R.id.txt_logout);
         database = new Create_database(getContext());
+        txt_profile_user = view.findViewById(R.id.txtEmail_user);
+
+
+        SharedPreferences sharedPreferences = getContext().getSharedPreferences("UserPrefs", Context.MODE_PRIVATE);
+        String currentEmail = sharedPreferences.getString("user_email", null);
+
+        txt_profile_user.setText(currentEmail);
+
 
         txt_logout.setOnClickListener(view1 -> logout());
         txt_change_pass.setOnClickListener(view2 -> showChangePasswordDialog());
-
+        txt_history_order.setOnClickListener(v -> {
+            Intent intent_next = new Intent(getContext(), History_Order.class);
+            startActivity(intent_next);
+        });
         return view;
     }
+
     //dialog đổi pasword
     private void showChangePasswordDialog() {
         LayoutInflater inflater = LayoutInflater.from(getContext());
@@ -67,6 +82,7 @@ public class ProfileFragment extends Fragment {
         });
         dialog.show();
     }
+
     // đổi mật khẩu
     private boolean changePassword(String oldPassword, String newPassword) {
         // Lấy email người dùng hiện tại từ SharedPreferences lưu trũ ở login
@@ -79,6 +95,7 @@ public class ProfileFragment extends Fragment {
         }
         return false; // Nếu mật khẩu cũ không đúng
     }
+
     // logout
     private void logout() {
         Intent intent = new Intent(getContext(), LogginActivity.class);

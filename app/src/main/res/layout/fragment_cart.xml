@@ -6,11 +6,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".user.CartFragment">
 
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
-
+        <include layout="@layout/header_layout_cart" />
 
         <ListView
             android:id="@+id/lv_cart"
@@ -25,16 +26,18 @@
             android:layout_gravity="bottom">
 
             <TextView
-                android:id="@+id/textViewTotalPrice"
+                android:id="@+id/txt_total_price"
                 android:layout_width="0dp"
-                android:layout_weight="1"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
+                android:layout_weight="1"
                 android:text="Tổng tiền: 0 VND"
-                android:textSize="18sp" />
+                android:textSize="14sp"
+                android:textStyle="bold|italic"
+                android:paddingLeft="20dp"/>
 
             <Button
-                android:id="@+id/buttonCheckout"
+                android:id="@+id/button_payment_food"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Thanh toán" />
