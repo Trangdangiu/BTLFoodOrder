@@ -45,25 +45,24 @@ public class CartFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_cart, container, false);
 
-        // Khởi tạo ListView và TextView
         listView = view.findViewById(R.id.lv_cart);
-        tvTotalItems = view.findViewById(R.id.txt_total_price); // Tham chiếu đến TextView hiển thị tổng số món
+        tvTotalItems = view.findViewById(R.id.txt_total_price);
         btn_pay_food = view.findViewById(R.id.button_payment_food);
         db = new Create_database(getActivity());
 
-        // Lấy danh sách các mục trong giỏ hàng
+
         int cartId = 1; // Có thể thay đổi ID giỏ hàng theo nhu cầu
         cartItems = db.getAllCartItems(cartId); // Sử dụng biến cartItems đã khai báo
 
-        // Tạo adapter
+
         adapter = new CartItemAdapter(getContext(), cartItems);
         listView.setAdapter(adapter);
 
-        // Hiển thị tổng số món ban đầu
+
         int totalItems = adapter.getTotalItems();
         tvTotalItems.setText("Tổng số món: " + totalItems);
 
-        // Lắng nghe khi tổng số món thay đổi
+
         adapter.setOnTotalItemsChangeListener(totalItems1 ->
                 tvTotalItems.setText("Tổng số món: " + totalItems1)
         );
@@ -93,7 +92,8 @@ public class CartFragment extends Fragment {
         EditText editTextAddress = bottomSheetView.findViewById(R.id.enter_adress_order);
         TextView txt_total_price = bottomSheetView.findViewById(R.id.txt_price);
         AppCompatButton buttonSubmit = bottomSheetView.findViewById(R.id.btn_submit_order);
-
+        AppCompatButton btn_cancel=bottomSheetView.findViewById(R.id.btn_cancel_order);
+        btn_cancel.setOnClickListener(v -> bottomSheetDialog.dismiss());
         // Thay ListView bằng TextView
         TextView txt_food_items = bottomSheetView.findViewById(R.id.txt_food_items);
         int cartId = 1; // Thay đổi ID giỏ hàng nếu cần
@@ -134,7 +134,7 @@ public class CartFragment extends Fragment {
             String paymentMethod = spinner_payment.getSelectedItem().toString();
 
             // Tạo đối tượng OrderItem
-            OrderItem orderItem = new OrderItem(0, orderCode, fullName, phoneNumber, address, menu, orderDate, total_item, paymentMethod);
+            OrderItem orderItem = new OrderItem(0, orderCode, fullName, phoneNumber, address, menu, orderDate, total_item, paymentMethod,false);
 
             // Chèn vào cơ sở dữ liệu
             long result = db.addOrderItem(orderItem);

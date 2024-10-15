@@ -1,6 +1,7 @@
 package com.example.testbotom.user;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -13,6 +14,7 @@ import android.widget.Toast;
 
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
 import com.example.testbotom.Database.CartItem;
@@ -22,7 +24,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialog;
 
 public class Food_detail extends AppCompatActivity {
     private TextView foodName, foodPrice, foodDescription;
-    private ImageView foodImage, image_ic_back;
+    private ImageView foodImage, image_ic_back,img_backto_cart;
     private Button btn_add_cart;
 
     @SuppressLint("MissingInflatedId")
@@ -31,16 +33,32 @@ public class Food_detail extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_food_detail);
 
-        // Liên kết các view
+        img_backto_cart=findViewById(R.id.img_cart);
         btn_add_cart = findViewById(R.id.btn_cart);
         foodName = findViewById(R.id.product_name);
         foodPrice = findViewById(R.id.product_price);
         foodImage = findViewById(R.id.product_image);
         foodDescription = findViewById(R.id.product_description);
         image_ic_back = findViewById(R.id.image_ic_back);
-        image_ic_back.setOnClickListener(v -> {
-            finish();
+        // Food_detail.java
+//        img_backto_cart.setOnClickListener(v -> {
+//            // Gọi hàm để thay thế Fragment
+//            replaceFragment(new CartFragment());
+//        });
+
+//        img_backto_cart.setOnClickListener(v -> {
+//            Intent intent= new Intent(this, CartFragment.class);
+//            startActivity(intent);
+//        });
+
+        image_ic_back.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+               finish();
+            }
         });
+
+
 
         btn_add_cart.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -55,7 +73,6 @@ public class Food_detail extends AppCompatActivity {
 
         loaddataFood();
     }
-
 
 
     private void showAddToCartDialog(String name, int price,String image) {

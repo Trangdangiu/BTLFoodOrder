@@ -77,7 +77,7 @@ public class Create_database extends SQLiteOpenHelper {
         // Tạo bảng chi tiết đơn hàng
         String CREATE_ORDER_ITEMS_TABLE = "CREATE TABLE " + TABLE_ORDER_ITEMS +
                 "(order_item_id INTEGER PRIMARY KEY AUTOINCREMENT, order_code TEXT, full_name TEXT, phone_number TEXT, " +
-                "address TEXT, menu TEXT, order_date DATETIME, total_amount REAL, payment_method TEXT, " +
+                "address TEXT, menu TEXT, order_date DATETIME, total_amount REAL, payment_method TEXT,isDelivery INTEGER DEFAULT 0, " +
                 "FOREIGN KEY (order_code) REFERENCES " + TABLE_ORDERS + "(order_id))";
         db.execSQL(CREATE_ORDER_ITEMS_TABLE);
     }
@@ -103,7 +103,6 @@ public class Create_database extends SQLiteOpenHelper {
         values.put("password", password);
         values.put("role", role); // Lưu loại người dùng
 
-        // Sử dụng đúng tên bảng
         long result = db.insert(TABLE_USER, null, values);
         db.close();
         return result != -1; // Trả về true nếu thêm thành công
@@ -219,6 +218,7 @@ public class Create_database extends SQLiteOpenHelper {
         int result = db.update("food", values, "id = ?", new String[]{String.valueOf(id)});
         db.close();
         return result > 0;
+
     }
 
 
@@ -370,47 +370,18 @@ public class Create_database extends SQLiteOpenHelper {
         if (cursor.moveToFirst()) {
             do {
                 @SuppressLint("Range") OrderItem orderItem = new OrderItem(
-                        cursor.getInt(cursor.getColumnIndex("order_item_id")),
-                        cursor.getString(cursor.getColumnIndex("order_code")),
-                        cursor.getString(cursor.getColumnIndex("full_name")),
-                        cursor.getString(cursor.getColumnIndex("phone_number")),
-                        cursor.getString(cursor.getColumnIndex("address")),
-                        cursor.getString(cursor.getColumnIndex("menu")),
-                        cursor.getString(cursor.getColumnIndex("order_date")),
-                        cursor.getDouble(cursor.getColumnIndex("total_amount")),
-                        cursor.getString(cursor.getColumnIndex("payment_method"))
+                        cursor.getInt(cursor.getColumnIndex("order_item_id")),  // Lấy order_item_id
+                        cursor.getString(cursor.getColumnIndex("order_code")),  // Lấy order_code
+                        cursor.getString(cursor.getColumnIndex("full_name")),   // Lấy full_name
+                        cursor.getString(cursor.getColumnIndex("phone_number")),// Lấy phone_number
+                        cursor.getString(cursor.getColumnIndex("address")),     // Lấy address
+                        cursor.getString(cursor.getColumnIndex("menu")),        // Lấy menu
+                        cursor.getString(cursor.getColumnIndex("order_date")),  // Lấy order_date
+                        cursor.getDouble(cursor.getColumnIndex("total_amount")),// Lấy total_amount
+                        cursor.getString(cursor.getColumnIndex("payment_method")),// Lấy payment_method
+                        cursor.getInt(cursor.getColumnIndex("isDelivery")) == 1  // Chuyển đổi isDelivery thành boolean
                 );
-                orderItemList.add(orderItem);
-            } while (cursor.moveToNext());
-        }
-
-        cursor.close();
-        db.close();
-        return orderItemList;
-    }
-// load theo ngay
-    public List<OrderItem> getOrderItemsByDate(String startDate, String endDate) {
-        List<OrderItem> orderItemList = new ArrayList<>();
-        SQLiteDatabase db = this.getReadableDatabase();
-
-        // Giả sử định dạng ngày là "dd/MM/yyyy", bạn cần định dạng lại để phù hợp với CSDL
-        String query = "SELECT * FROM " + TABLE_ORDER_ITEMS + " WHERE order_date BETWEEN ? AND ?";
-        Cursor cursor = db.rawQuery(query, new String[]{startDate, endDate});
-
-        if (cursor.moveToFirst()) {
-            do {
-                @SuppressLint("Range") OrderItem orderItem = new OrderItem(
-                        cursor.getInt(cursor.getColumnIndex("order_item_id")),
-                        cursor.getString(cursor.getColumnIndex("order_code")),
-                        cursor.getString(cursor.getColumnIndex("full_name")),
-                        cursor.getString(cursor.getColumnIndex("phone_number")),
-                        cursor.getString(cursor.getColumnIndex("address")),
-                        cursor.getString(cursor.getColumnIndex("menu")),
-                        cursor.getString(cursor.getColumnIndex("order_date")),
-                        cursor.getDouble(cursor.getColumnIndex("total_amount")),
-                        cursor.getString(cursor.getColumnIndex("payment_method"))
-                );
-                orderItemList.add(orderItem);
+                orderItemList.add(orderItem);  // Thêm đối tượng vào danh sách
             } while (cursor.moveToNext());
         }
 
@@ -419,6 +390,55 @@ public class Create_database extends SQLiteOpenHelper {
         return orderItemList;
     }
 
+ //load theo ngay
+ public List<OrderItem> getOrderItemsByDate(String startDate, String endDate) {
+     List<OrderItem> orderItemList = new ArrayList<>();
+     SQLiteDatabase db = this.getReadableDatabase();
+
+     // Chuyển đổi định dạng ngày từ "dd/MM/yyyy" sang "yyyy-MM-dd"
+     String[] startDateParts = startDate.split("/");
+     String[] endDateParts = endDate.split("/");
+
+     // Tạo lại định dạng ngày theo chuẩn yyyy-MM-dd
+     String formattedStartDate = startDateParts[2] + "-" + startDateParts[1] + "-" + startDateParts[0];
+     String formattedEndDate = endDateParts[2] + "-" + endDateParts[1] + "-" + endDateParts[0];
+
+     // Giả sử định dạng ngày là "yyyy-MM-dd", bạn cần định dạng lại để phù hợp với CSDL
+     String query = "SELECT * FROM " + TABLE_ORDER_ITEMS + " WHERE order_date BETWEEN ? AND ?";
+     Cursor cursor = db.rawQuery(query, new String[]{formattedStartDate, formattedEndDate});
+
+     if (cursor.moveToFirst()) {
+         do {
+             @SuppressLint("Range") OrderItem orderItem = new OrderItem(
+                     cursor.getInt(cursor.getColumnIndex("order_item_id")),
+                     cursor.getString(cursor.getColumnIndex("order_code")),
+                     cursor.getString(cursor.getColumnIndex("full_name")),
+                     cursor.getString(cursor.getColumnIndex("phone_number")),
+                     cursor.getString(cursor.getColumnIndex("address")),
+                     cursor.getString(cursor.getColumnIndex("menu")),
+                     cursor.getString(cursor.getColumnIndex("order_date")),
+                     cursor.getDouble(cursor.getColumnIndex("total_amount")),
+                     cursor.getString(cursor.getColumnIndex("payment_method")),
+                     cursor.getInt(cursor.getColumnIndex("isDelivery")) == 1
+             );
+             orderItemList.add(orderItem);
+         } while (cursor.moveToNext());
+     }
+
+     cursor.close();
+     db.close();
+     return orderItemList;
+ }
+
+
+    public void updateOrderDeliveryStatus(int orderId, boolean isDelivery) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("isDelivery", isDelivery ? 1 : 0);  // Chuyển boolean thành 1 hoặc 0
+
+        db.update(TABLE_ORDER_ITEMS, values, "order_item_id = ?", new String[]{String.valueOf(orderId)});
+        db.close();
+    }
 
 
 
