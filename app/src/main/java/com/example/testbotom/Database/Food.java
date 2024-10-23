@@ -1,7 +1,5 @@
 package com.example.testbotom.Database;
 
-import android.net.Uri;
-
 public class Food {
     private int id;
     private String name;

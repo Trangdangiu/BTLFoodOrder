@@ -10,12 +10,13 @@ public class OrderItem {
     private String orderDate;       // order_date
     private double totalAmount;      // total_amount
     private String paymentMethod;    // payment_method
-    private boolean isDelivery;      // isDelivery (trạng thái checkbox giao hàng)
+    private boolean isDelivery;     // isDelivery (trạng thái checkbox giao hàng)
+    private int userId;             // user_id (kết nối với bảng user)
 
     // Constructor
     public OrderItem(int orderItemId, String orderCode, String fullName, String phoneNumber,
                      String address, String menu, String orderDate, double totalAmount,
-                     String paymentMethod, boolean isDelivery) {
+                     String paymentMethod, boolean isDelivery, int userId) {
         this.orderItemId = orderItemId;
         this.orderCode = orderCode;
         this.fullName = fullName;
@@ -26,6 +27,7 @@ public class OrderItem {
         this.totalAmount = totalAmount;
         this.paymentMethod = paymentMethod;
         this.isDelivery = isDelivery;  // Khởi tạo trạng thái giao hàng
+        this.userId = userId;  // Kết nối với user
     }
 
     // Getters and Setters
@@ -107,5 +109,13 @@ public class OrderItem {
 
     public void setDelivery(boolean delivery) {
         isDelivery = delivery;
+    }
+
+    public int getUserId() {
+        return userId;
+    }
+
+    public void setUserId(int userId) {
+        this.userId = userId;
     }
 }

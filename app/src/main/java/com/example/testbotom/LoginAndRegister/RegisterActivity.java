@@ -1,7 +1,5 @@
 package com.example.testbotom.LoginAndRegister;
 
-import static com.example.testbotom.user.OtpGenerator.generateOtp;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -17,7 +15,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.testbotom.Database.Create_database;
 import com.example.testbotom.R;
-import com.example.testbotom.user.SendEmailTask;
 
 public class RegisterActivity extends AppCompatActivity {
     private Create_database dbHelper;

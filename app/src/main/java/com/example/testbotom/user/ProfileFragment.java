@@ -40,7 +40,6 @@ public class ProfileFragment extends Fragment {
 
         txt_profile_user.setText(currentEmail);
 
-
         txt_logout.setOnClickListener(view1 -> logout());
         txt_change_pass.setOnClickListener(view2 -> showChangePasswordDialog());
         txt_history_order.setOnClickListener(v -> {
@@ -98,8 +97,11 @@ public class ProfileFragment extends Fragment {
 
     // logout
     private void logout() {
+        getActivity().getSharedPreferences("UserPrefs", getContext().MODE_PRIVATE).edit().clear().apply();
         Intent intent = new Intent(getContext(), LogginActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
         getActivity().finish(); // Kết thúc Activity hiện tại
     }
+
 }

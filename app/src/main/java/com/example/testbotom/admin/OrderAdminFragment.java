@@ -35,7 +35,6 @@ public class OrderAdminFragment extends Fragment {
         db = new Create_database(getContext());
         orderItemList = new ArrayList<>();
 
-        // Lấy dữ liệu từ cơ sở dữ liệu và hiển thị lên RecyclerView
         loadOrderItems();
 
         return view;
@@ -43,7 +42,7 @@ public class OrderAdminFragment extends Fragment {
 
     private void loadOrderItems() {
         orderItemList.clear(); // Xóa danh sách cũ
-        orderItemList.addAll(db.getAllOrderItems()); // Lấy dữ liệu từ DB và thêm vào danh sách
+        orderItemList.addAll(db.getAllOrderItemsAdmin()); // Lấy dữ liệu từ DB và thêm vào danh sách
         orderAdapter = new OrderItemAdapter(orderItemList); // Tạo adapter với dữ liệu mới
         recyclerView.setAdapter(orderAdapter); // Đặt adapter cho RecyclerView
     }

@@ -1,8 +1,8 @@
 package com.example.testbotom.user;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -50,8 +50,12 @@ public class CartFragment extends Fragment {
         btn_pay_food = view.findViewById(R.id.button_payment_food);
         db = new Create_database(getActivity());
 
+        int cartId = getActivity().getSharedPreferences("UserPrefs", getContext().MODE_PRIVATE).getInt("cartId", -1);
 
-        int cartId = 1; // Có thể thay đổi ID giỏ hàng theo nhu cầu
+        if (cartId == -1) {
+            Toast.makeText(getContext(), "Lỗi: Không tìm thấy giỏ hàng.", Toast.LENGTH_SHORT).show();
+            return view; // Không tiếp tục nếu không tìm thấy giỏ hàng
+        }
         cartItems = db.getAllCartItems(cartId); // Sử dụng biến cartItems đã khai báo
 
 
@@ -60,11 +64,11 @@ public class CartFragment extends Fragment {
 
 
         int totalItems = adapter.getTotalItems();
-        tvTotalItems.setText("Tổng số món: " + totalItems);
+        tvTotalItems.setText("Tổng số Tiền: " + totalItems+ " VNĐ");
 
 
         adapter.setOnTotalItemsChangeListener(totalItems1 ->
-                tvTotalItems.setText("Tổng số món: " + totalItems1)
+                tvTotalItems.setText("Tổng số Tiền: " + totalItems1+" VNĐ")
         );
 
         btn_pay_food.setOnClickListener(v -> {
@@ -75,6 +79,7 @@ public class CartFragment extends Fragment {
     }
 
     // show_dialog
+
     private void showBottomSheetDialog(int total_item) {
         BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(getContext());
         View bottomSheetView = LayoutInflater.from(getContext()).inflate(R.layout.item_input_order_food, null);
@@ -85,7 +90,6 @@ public class CartFragment extends Fragment {
         ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, paymentMethods);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner_payment.setAdapter(adapter);
-
         // Lấy thông tin từ người dùng
         EditText editTextFullName = bottomSheetView.findViewById(R.id.enter_fulname_order);
         EditText editTextPhoneNumber = bottomSheetView.findViewById(R.id.enter_sdt_order);
@@ -96,7 +100,8 @@ public class CartFragment extends Fragment {
         btn_cancel.setOnClickListener(v -> bottomSheetDialog.dismiss());
         // Thay ListView bằng TextView
         TextView txt_food_items = bottomSheetView.findViewById(R.id.txt_food_items);
-        int cartId = 1; // Thay đổi ID giỏ hàng nếu cần
+        // lay id tu sharedreference
+        int cartId = getActivity().getSharedPreferences("UserPrefs", getContext().MODE_PRIVATE).getInt("cartId", -1);// Thay đổi ID giỏ hàng nếu cần
         List<CartItem> cartItemsDetail = db.getAllCartItems(cartId); // Lấy các món ăn chi tiết cho giỏ hàng
 
         // Xây dựng thông tin thực đơn từ cartItemsDetail
@@ -118,7 +123,7 @@ public class CartFragment extends Fragment {
         // Hiển thị tổng giá
         txt_total_price.setText(String.valueOf(total_item));
 
-        // Xử lý sự kiện khi nhấn nút Submit
+        // Xử lý sự kiện khi nhấn nút dat hang
         buttonSubmit.setOnClickListener(v -> {
             String fullName = editTextFullName.getText().toString().trim();
             String phoneNumber = editTextPhoneNumber.getText().toString().trim();
@@ -133,13 +138,16 @@ public class CartFragment extends Fragment {
             // Lấy phương thức thanh toán đã chọn
             String paymentMethod = spinner_payment.getSelectedItem().toString();
 
+            String userIdStr = getActivity().getSharedPreferences("UserPrefs", Context.MODE_PRIVATE).getString("user_id", "-1");
+            int user_id= Integer.parseInt(userIdStr);
             // Tạo đối tượng OrderItem
-            OrderItem orderItem = new OrderItem(0, orderCode, fullName, phoneNumber, address, menu, orderDate, total_item, paymentMethod,false);
+            OrderItem orderItem = new OrderItem(0, orderCode, fullName, phoneNumber, address, menu, orderDate, total_item, paymentMethod,false,user_id);
 
             // Chèn vào cơ sở dữ liệu
             long result = db.addOrderItem(orderItem);
             if (result != -1) {
                 Toast.makeText(getContext(), "Đặt hàng thành công!", Toast.LENGTH_SHORT).show();
+                db.clearCart();
             } else {
                 Toast.makeText(getContext(), "Đặt hàng không thành công. Vui lòng thử lại.", Toast.LENGTH_SHORT).show();
             }
@@ -151,9 +159,5 @@ public class CartFragment extends Fragment {
         bottomSheetDialog.setContentView(bottomSheetView);
         bottomSheetDialog.show();
     }
-
-
-
-
 
 }

@@ -4,7 +4,6 @@ import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -35,7 +34,7 @@ public class FoodAdapterHomeAdmin extends RecyclerView.Adapter<FoodAdapterHomeAd
     public void onBindViewHolder(@NonNull FoodViewHolder holder, int position) {
         Food food = foodList.get(position);
         holder.foodName.setText(food.getName());
-        holder.foodPrice.setText("Giá: " + food.getPrice() +" 000"+ " VND");
+        holder.foodPrice.setText("Giá: " + food.getPrice() +""+ " VND");
         holder.foodDescription.setText(food.getDescription());
         Glide.with(holder.itemView.getContext())
                 .load(Uri.parse(food.getImage())) // Đường dẫn ảnh

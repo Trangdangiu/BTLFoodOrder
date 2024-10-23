@@ -2,6 +2,7 @@ package com.example.testbotom.user;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -12,9 +13,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.bumptech.glide.Glide;
 import com.example.testbotom.Database.CartItem;
@@ -23,9 +24,16 @@ import com.example.testbotom.R;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 
 public class Food_detail extends AppCompatActivity {
+
+    private SharedPreferences sharedPreferences;
+    private static final String PREFS_NAME = "UserPrefs";
+    private static final String CART_ID_KEY = "cartId";
     private TextView foodName, foodPrice, foodDescription;
-    private ImageView foodImage, image_ic_back,img_backto_cart;
+    private ImageView foodImage, image_ic_back, img_backto_cart;
     private Button btn_add_cart;
+
+    private int userId; // Đảm bảo userId được định nghĩa
+    private Create_database db;
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -33,63 +41,61 @@ public class Food_detail extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_food_detail);
 
-        img_backto_cart=findViewById(R.id.img_cart);
+        img_backto_cart = findViewById(R.id.img_cart);
         btn_add_cart = findViewById(R.id.btn_cart);
         foodName = findViewById(R.id.product_name);
         foodPrice = findViewById(R.id.product_price);
         foodImage = findViewById(R.id.product_image);
         foodDescription = findViewById(R.id.product_description);
         image_ic_back = findViewById(R.id.image_ic_back);
-        // Food_detail.java
-//        img_backto_cart.setOnClickListener(v -> {
-//            // Gọi hàm để thay thế Fragment
-//            replaceFragment(new CartFragment());
-//        });
+        db = new Create_database(this);
 
-//        img_backto_cart.setOnClickListener(v -> {
-//            Intent intent= new Intent(this, CartFragment.class);
-//            startActivity(intent);
-//        });
-
-        image_ic_back.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-               finish();
-            }
+        sharedPreferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        String userIdString = sharedPreferences.getString("user_id", null); // Lấy userId từ Intent
+        // check userid
+        if (userIdString == null) {
+            Toast.makeText(this, "Lỗi: Không tìm thấy userId.", Toast.LENGTH_SHORT).show();
+            finish(); // Đóng Activity nếu không tìm thấy userId
+            return;
+        }else{
+            userId=Integer.parseInt(userIdString);
+        }
+        img_backto_cart.setOnClickListener(v -> {
+            Fragment fragment= new CartFragment();
+            FragmentTransaction transaction= getSupportFragmentManager().beginTransaction();
+            transaction.replace(R.id.fragment_container,fragment);
+//                transaction.addToBackStack(null);
+            transaction.commit();
         });
 
-
-
-        btn_add_cart.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String name = getIntent().getStringExtra("foodName");
-                int price = getIntent().getIntExtra("foodPrice", 0);
-                String imageUri = getIntent().getStringExtra("foodImage"); // Nhận URI ảnh dưới dạng String
-                String description = getIntent().getStringExtra("foodDescription");
-            showAddToCartDialog(name,price,imageUri);
-            }
+        image_ic_back.setOnClickListener(v -> {
+            finish();
+        });
+        btn_add_cart.setOnClickListener(v -> {
+            String name = getIntent().getStringExtra("foodName");
+            int price = getIntent().getIntExtra("foodPrice", 0);
+            String imageUri = getIntent().getStringExtra("foodImage");
+            String description = getIntent().getStringExtra("foodDescription");
+            showAddToCartDialog(name, price, imageUri);
         });
 
         loaddataFood();
     }
 
-
-    private void showAddToCartDialog(String name, int price,String image) {
+    private void showAddToCartDialog(String name, int price, String image) {
         BottomSheetDialog dialog = new BottomSheetDialog(this);
         View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_add_to_cart, null);
         dialog.setContentView(dialogView);
-        TextView txt_name= dialogView.findViewById(R.id.txt_tenmon);
-        TextView txt_price=dialogView.findViewById(R.id.txt_gia);
-        ImageView img_input=dialogView.findViewById(R.id.img_input);
-        EditText quantityInput = dialogView.findViewById(R.id.quantity_input); // soluong
+        TextView txt_name = dialogView.findViewById(R.id.txt_tenmon);
+        TextView txt_price = dialogView.findViewById(R.id.txt_gia);
+        ImageView img_input = dialogView.findViewById(R.id.img_input);
+        EditText quantityInput = dialogView.findViewById(R.id.quantity_input);
         Button addButton = dialogView.findViewById(R.id.add_button);
         Button cancelButton = dialogView.findViewById(R.id.cancel_button);
-        //
         txt_name.setText(name);
-        txt_price.setText(price+" VNĐ");
+        txt_price.setText(price + " VNĐ");
         Glide.with(this)
-                .load(Uri.parse(image)) // Chuyển đổi lại từ String sang Uri
+                .load(Uri.parse(image))
                 .placeholder(R.drawable.anh1)
                 .error(R.drawable.ic_home)
                 .into(img_input);
@@ -97,8 +103,7 @@ public class Food_detail extends AppCompatActivity {
             String quantityText = quantityInput.getText().toString();
             if (!quantityText.isEmpty()) {
                 int quantity = Integer.parseInt(quantityText);
-                // Thêm logic để thêm sản phẩm vào giỏ hàng
-                addToCart(name, price, quantity,image);
+                addToCart(name, price, quantity, image);
                 dialog.dismiss();
             } else {
                 Toast.makeText(this, "Vui lòng nhập số lượng", Toast.LENGTH_SHORT).show();
@@ -106,23 +111,35 @@ public class Food_detail extends AppCompatActivity {
         });
 
         cancelButton.setOnClickListener(v -> dialog.dismiss());
-
         dialog.show();
     }
-    // ham goi contruct de add du lieu vao database
+
     private void addToCart(String name, double price, int quantity, String image) {
-        int cartId = 1; // Thay đổi giá trị này theo giỏ hàng hiện tại
+        int cartId = getOrCreateUserCartId(userId); // Lấy ID giỏ hàng
         int foodId = getIntent().getIntExtra("foodId", 0);
         CartItem cartItem = new CartItem(0, cartId, foodId, name, price, image, quantity);
 
-        Create_database db = new Create_database(this);
         long result = db.addCartItem(cartItem); // Giả sử phương thức trả về ID của bản ghi mới
 
         if (result != -1) {
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putInt("cartId", cartId); // Lưu cartId
+            editor.apply();
             Toast.makeText(this, "Đã thêm " + quantity + " " + name + " vào giỏ hàng.", Toast.LENGTH_SHORT).show();
         } else {
             Toast.makeText(this, "Thêm vào giỏ hàng thất bại.", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    private int getOrCreateUserCartId(int userId) {
+        int cartId = db.getCartIdByUserId(userId); // Kiểm tra giỏ hàng
+
+        if (cartId == -1) {
+            // Nếu không tìm thấy giỏ hàng, tạo giỏ hàng mới
+            cartId = (int) db.createCart(userId);
+        }
+
+        return cartId;
     }
 
 
@@ -131,17 +148,17 @@ public class Food_detail extends AppCompatActivity {
     private void loaddataFood() {
         String name = getIntent().getStringExtra("foodName");
         int price = getIntent().getIntExtra("foodPrice", 0);
-        String imageUri = getIntent().getStringExtra("foodImage"); // Nhận URI ảnh dưới dạng String
+        String imageUri = getIntent().getStringExtra("foodImage");
         String description = getIntent().getStringExtra("foodDescription");
 
         // Set dữ liệu vào view
         foodName.setText(name);
-        foodPrice.setText("Giá:  " + String.valueOf(price) + "VNĐ");
+        foodPrice.setText("Giá:  " + price + " VNĐ");
         foodDescription.setText(description);
 
         // Load ảnh từ URI bằng Glide
         Glide.with(this)
-                .load(Uri.parse(imageUri)) // Chuyển đổi lại từ String sang Uri
+                .load(Uri.parse(imageUri))
                 .placeholder(R.drawable.anh1)
                 .error(R.drawable.ic_home)
                 .into(foodImage);

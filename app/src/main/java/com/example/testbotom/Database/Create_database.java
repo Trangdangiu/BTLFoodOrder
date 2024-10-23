@@ -33,7 +33,7 @@ public class Create_database extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         // Tạo bảng người dùng
         String CREATE_USERS_TABLE = "CREATE TABLE " + TABLE_USER +
-                " (id INTEGER PRIMARY KEY AUTOINCREMENT, email TEXT UNIQUE, password TEXT, role TEXT)";
+                " (user_id INTEGER PRIMARY KEY AUTOINCREMENT, email TEXT UNIQUE, password TEXT, role TEXT)";
         db.execSQL(CREATE_USERS_TABLE);
 
         // Tạo bảng món ăn
@@ -51,7 +51,7 @@ public class Create_database extends SQLiteOpenHelper {
         String CREATE_CART_TABLE = "CREATE TABLE " + TABLE_CART +
                 "(cart_id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER, " +
                 "created_at DATETIME DEFAULT CURRENT_TIMESTAMP, " +
-                "FOREIGN KEY (user_id) REFERENCES " + TABLE_USER + "(id))";
+                "FOREIGN KEY (user_id) REFERENCES " + TABLE_USER + "(user_id))";
         db.execSQL(CREATE_CART_TABLE);
 
 
@@ -71,15 +71,24 @@ public class Create_database extends SQLiteOpenHelper {
         String CREATE_ORDERS_TABLE = "CREATE TABLE " + TABLE_ORDERS +
                 "(order_id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER, full_name TEXT, phone_number TEXT, " +
                 "address TEXT, payment_method TEXT, order_date DATETIME DEFAULT CURRENT_TIMESTAMP, total_amount REAL, " +
-                "FOREIGN KEY (user_id) REFERENCES " + TABLE_USER + "(id))";
+                "FOREIGN KEY (user_id) REFERENCES " + TABLE_USER + "(user_id))";
         db.execSQL(CREATE_ORDERS_TABLE);
 
         // Tạo bảng chi tiết đơn hàng
+//        String CREATE_ORDER_ITEMS_TABLE = "CREATE TABLE " + TABLE_ORDER_ITEMS +
+//                "(order_item_id INTEGER PRIMARY KEY AUTOINCREMENT, order_code TEXT, full_name TEXT, phone_number TEXT, " +
+//                "address TEXT, menu TEXT, order_date DATETIME, total_amount REAL, payment_method TEXT,isDelivery INTEGER DEFAULT 0, " +
+//                "FOREIGN KEY (order_code) REFERENCES " + TABLE_ORDERS + "(order_id))";
+//        db.execSQL(CREATE_ORDER_ITEMS_TABLE);
+
         String CREATE_ORDER_ITEMS_TABLE = "CREATE TABLE " + TABLE_ORDER_ITEMS +
                 "(order_item_id INTEGER PRIMARY KEY AUTOINCREMENT, order_code TEXT, full_name TEXT, phone_number TEXT, " +
-                "address TEXT, menu TEXT, order_date DATETIME, total_amount REAL, payment_method TEXT,isDelivery INTEGER DEFAULT 0, " +
-                "FOREIGN KEY (order_code) REFERENCES " + TABLE_ORDERS + "(order_id))";
+                "address TEXT, menu TEXT, order_date DATETIME, total_amount REAL, payment_method TEXT, isDelivery INTEGER DEFAULT 0, " +
+                "user_id INTEGER, " +  // Thêm trường user_id
+                "FOREIGN KEY (order_code) REFERENCES " + TABLE_ORDERS + "(order_id), " +  // Khóa ngoại với bảng orders
+                "FOREIGN KEY (user_id) REFERENCES " + TABLE_USER + "(user_id))"; // Khóa ngoại với bảng users
         db.execSQL(CREATE_ORDER_ITEMS_TABLE);
+
     }
 
 
@@ -121,6 +130,34 @@ public class Create_database extends SQLiteOpenHelper {
         db.close();
         return role; // Trả về vai trò người dùng (Admin hoặc User)
     }
+
+    @SuppressLint("Range")
+    public Integer getUserIdByEmail(String email) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = null;
+        Integer userId = null; // Khởi tạo biến userId
+
+        try {
+            // Thực hiện câu truy vấn để lấy ID người dùng dựa trên email
+            cursor = db.rawQuery("SELECT user_id FROM " + TABLE_USER + " WHERE email=?", new String[]{email});
+
+            // Kiểm tra xem cursor có dữ liệu không
+            if (cursor != null && cursor.moveToFirst()) {
+                userId = cursor.getInt(cursor.getColumnIndex("user_id")); // Lấy ID từ cột
+            }
+        } catch (Exception e) {
+            e.printStackTrace(); // In ra lỗi nếu có
+        } finally {
+            if (cursor != null) {
+                cursor.close(); // Đảm bảo đóng cursor để tránh rò rỉ bộ nhớ
+            }
+        }
+
+        return userId; // Trả về ID hoặc null nếu không tìm thấy
+    }
+
+
+
 
     // thêm món ăn vào bang
     public void insertFood(Food food) {
@@ -251,23 +288,45 @@ public class Create_database extends SQLiteOpenHelper {
         db.close();
         return cartId;
     }
+//
+//    public int getCartIdByUserId(int userId) {
+//        SQLiteDatabase db = this.getReadableDatabase();
+//        Cursor cursor = db.query("Cart", new String[]{"id"}, "userId = ?", new String[]{String.valueOf(userId)}, null, null, null);
+//
+//        if (cursor != null && cursor.moveToFirst()) {
+//            @SuppressLint("Range") int cartId = cursor.getInt(cursor.getColumnIndex("id"));
+//            cursor.close();
+//            return cartId;
+//        }
+//
+//        if (cursor != null) {
+//            cursor.close();
+//        }
+//
+//        return -1; // Nếu không tìm thấy giỏ hàng
+//    }
+
     // Thêm mục vào giỏ hàng
     public long addCartItem(CartItem cartItem) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
-
         values.put("cart_id", cartItem.getCartId());
         values.put("food_id", cartItem.getFoodId());
         values.put("food_name", cartItem.getFoodName());
         values.put("food_price", cartItem.getFoodPrice());
         values.put("food_image", cartItem.getFoodImage());
         values.put("quantity", cartItem.getQuantity());
-
-        // Thêm vào cơ sở dữ liệu
         db.insert("cart_items", null, values);
         db.close();
         return 0;
     }
+
+    public void clearCart() {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL("DELETE FROM cart_items");
+        db.close();
+    }
+
     // Cập nhật số lượng của một mục trong giỏ hàng
     public boolean updateCartItem(int cartItemId, int quantity) {
         SQLiteDatabase db = this.getWritableDatabase();
@@ -292,6 +351,20 @@ public class Create_database extends SQLiteOpenHelper {
         }
         db.close();
         return cartId; // Trả về cart_id hoặc -1 nếu không tìm thấy
+    }
+    public Integer getCartIdByUserId(Integer userId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT cart_id FROM " + TABLE_CART + " WHERE user_id = ?", new String[]{userId.toString()});
+
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
+                int cartId = cursor.getInt(0);
+                cursor.close();
+                return cartId;
+            }
+            cursor.close();
+        }
+        return null;
     }
 
 
@@ -353,6 +426,7 @@ public class Create_database extends SQLiteOpenHelper {
         values.put("order_date", orderItem.getOrderDate());
         values.put("total_amount", orderItem.getTotalAmount());
         values.put("payment_method", orderItem.getPaymentMethod());
+        values.put("user_id", orderItem.getUserId());
 
         // Chèn hàng vào bảng
         long result = db.insert(TABLE_ORDER_ITEMS, null, values);
@@ -362,9 +436,40 @@ public class Create_database extends SQLiteOpenHelper {
 
 
 
-    public List<OrderItem> getAllOrderItems() {
+    public List<OrderItem> getAllOrderItems(int user_id) {
         List<OrderItem> orderItemList = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_ORDER_ITEMS + " WHERE user_id = ?", new String[]{String.valueOf(user_id)});
+
+        if (cursor.moveToFirst()) {
+            do {
+                @SuppressLint("Range") OrderItem orderItem = new OrderItem(
+                        cursor.getInt(cursor.getColumnIndex("order_item_id")),  // Lấy order_item_id
+                        cursor.getString(cursor.getColumnIndex("order_code")),  // Lấy order_code
+                        cursor.getString(cursor.getColumnIndex("full_name")),   // Lấy full_name
+                        cursor.getString(cursor.getColumnIndex("phone_number")),// Lấy phone_number
+                        cursor.getString(cursor.getColumnIndex("address")),     // Lấy address
+                        cursor.getString(cursor.getColumnIndex("menu")),        // Lấy menu
+                        cursor.getString(cursor.getColumnIndex("order_date")),  // Lấy order_date
+                        cursor.getDouble(cursor.getColumnIndex("total_amount")),// Lấy total_amount
+                        cursor.getString(cursor.getColumnIndex("payment_method")),// Lấy payment_method
+                        cursor.getInt(cursor.getColumnIndex("isDelivery")) == 1,
+                        cursor.getInt(cursor.getColumnIndex("user_id"))
+                        // Chuyển đổi isDelivery thành boolean
+                );
+                orderItemList.add(orderItem);  // Thêm đối tượng vào danh sách
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+        db.close();
+        return orderItemList;
+    }
+    public List<OrderItem> getAllOrderItemsAdmin() {
+        List<OrderItem> orderItemList = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        // Truy vấn lấy tất cả dữ liệu từ bảng order_item
         Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_ORDER_ITEMS, null);
 
         if (cursor.moveToFirst()) {
@@ -379,7 +484,8 @@ public class Create_database extends SQLiteOpenHelper {
                         cursor.getString(cursor.getColumnIndex("order_date")),  // Lấy order_date
                         cursor.getDouble(cursor.getColumnIndex("total_amount")),// Lấy total_amount
                         cursor.getString(cursor.getColumnIndex("payment_method")),// Lấy payment_method
-                        cursor.getInt(cursor.getColumnIndex("isDelivery")) == 1  // Chuyển đổi isDelivery thành boolean
+                        cursor.getInt(cursor.getColumnIndex("isDelivery")) == 1, // Chuyển đổi isDelivery thành boolean
+                        cursor.getInt(cursor.getColumnIndex("user_id")) // Lấy user_id
                 );
                 orderItemList.add(orderItem);  // Thêm đối tượng vào danh sách
             } while (cursor.moveToNext());
@@ -390,7 +496,8 @@ public class Create_database extends SQLiteOpenHelper {
         return orderItemList;
     }
 
- //load theo ngay
+
+    //load theo ngay
  public List<OrderItem> getOrderItemsByDate(String startDate, String endDate) {
      List<OrderItem> orderItemList = new ArrayList<>();
      SQLiteDatabase db = this.getReadableDatabase();
@@ -419,7 +526,8 @@ public class Create_database extends SQLiteOpenHelper {
                      cursor.getString(cursor.getColumnIndex("order_date")),
                      cursor.getDouble(cursor.getColumnIndex("total_amount")),
                      cursor.getString(cursor.getColumnIndex("payment_method")),
-                     cursor.getInt(cursor.getColumnIndex("isDelivery")) == 1
+                     cursor.getInt(cursor.getColumnIndex("isDelivery")) == 1,
+                     cursor.getInt(cursor.getColumnIndex("user_id"))
              );
              orderItemList.add(orderItem);
          } while (cursor.moveToNext());
@@ -439,6 +547,23 @@ public class Create_database extends SQLiteOpenHelper {
         db.update(TABLE_ORDER_ITEMS, values, "order_item_id = ?", new String[]{String.valueOf(orderId)});
         db.close();
     }
+
+    public boolean isAdmin(int userId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT role FROM users WHERE id = ?", new String[]{String.valueOf(userId)});
+
+        if (cursor != null && cursor.moveToFirst()) {
+            @SuppressLint("Range") String role = cursor.getString(cursor.getColumnIndex("role"));
+            cursor.close();
+            return "admin".equals(role); // Trả về true nếu vai trò là admin
+        }
+
+        if (cursor != null) {
+            cursor.close();
+        }
+        return false; // Trả về false nếu không phải admin hoặc không tìm thấy người dùng
+    }
+
 
 
 

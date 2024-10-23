@@ -3,6 +3,7 @@ package com.example.testbotom.admin;
 import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -16,7 +17,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.testbotom.Adapter.Adapter_revanue;
 import com.example.testbotom.Database.Create_database;
 import com.example.testbotom.Database.OrderItem;
-import com.example.testbotom.R;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.data.Entry;
@@ -28,38 +28,14 @@ import java.util.Calendar;
 import java.util.List;
 
 
-import android.annotation.SuppressLint;
-import android.app.DatePickerDialog;
-import android.os.Bundle;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.Toast;
-
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
-import com.example.testbotom.Adapter.Adapter_revanue;
-import com.example.testbotom.Database.Create_database;
-import com.example.testbotom.Database.OrderItem;
 import com.example.testbotom.R;
-import com.github.mikephil.charting.charts.LineChart;
-import com.github.mikephil.charting.components.XAxis;
-import com.github.mikephil.charting.data.Entry;
-import com.github.mikephil.charting.data.LineData;
-import com.github.mikephil.charting.data.LineDataSet;
-
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
 
 public class Revenue extends AppCompatActivity {
     private EditText editTextStartDate, editTextEndDate;
     private RecyclerView recyclerView;
     private Adapter_revanue adapter_revanue;
     private Create_database databaseHelper;
-    private Button buttonReload;
+    private Button buttonReload,btn_back;
     private LineChart lineChart;
     private TextView txt_alltotalamount;
 
@@ -77,6 +53,8 @@ public class Revenue extends AppCompatActivity {
         recyclerView = findViewById(R.id.recyclerViewRevenue);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         txt_alltotalamount=findViewById(R.id.view_totalamount);
+        btn_back=findViewById(R.id.btn_back);
+
         // Khởi tạo cơ sở dữ liệu
         databaseHelper = new Create_database(this);
 
@@ -86,6 +64,12 @@ public class Revenue extends AppCompatActivity {
 
         // Sự kiện khi bấm nút reload
         buttonReload.setOnClickListener(v -> loadRevenueData());
+        btn_back.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
     }
 
     private void showDatePickerDialog(EditText editText) {
@@ -116,27 +100,38 @@ public class Revenue extends AppCompatActivity {
         // Lấy danh sách đơn hàng từ cơ sở dữ liệu theo khoảng thời gian
         List<OrderItem> orderItems = databaseHelper.getOrderItemsByDate(startDate, endDate);
 
-        if (orderItems.isEmpty()) {
+        // Danh sách để lưu trữ các đơn hàng đã lọc có isDelivery = true
+        List<OrderItem> filteredOrderItems = new ArrayList<>();
+
+        // Lọc các đơn hàng có isDelivery = true
+        for (OrderItem item : orderItems) {
+            if (item.isDelivery()) {
+                filteredOrderItems.add(item); // Thêm vào danh sách đã lọc
+            }
+        }
+
+        // Kiểm tra nếu không có đơn hàng nào được lọc
+        if (filteredOrderItems.isEmpty()) {
             Toast.makeText(this, "Không có dữ liệu doanh thu!", Toast.LENGTH_SHORT).show();
             lineChart.clear(); // Xóa dữ liệu biểu đồ
+            if (adapter_revanue != null) {
+                adapter_revanue.clearData(); // Xóa dữ liệu cũ trong RecyclerView
+            }
+            txt_alltotalamount.setText("0 VNĐ");
             return;
         }
 
-        // Tính doanh thu từ đơn hàng
+        // Tính doanh thu từ các đơn hàng đã lọc
         ArrayList<Entry> lineEntries = new ArrayList<>();
         float totalRevenue = 0;
         int index = 0;
 
-        for (OrderItem item : orderItems) {
+        for (OrderItem item : filteredOrderItems) {
             totalRevenue += item.getTotalAmount();
             lineEntries.add(new Entry(index++, totalRevenue)); // Thêm doanh thu vào biểu đồ
         }
 
-        for (OrderItem item : orderItems) {
-            totalRevenue += item.getTotalAmount();
-            // Thêm doanh thu vào biểu đồ
-        }
-        txt_alltotalamount.setText(totalRevenue+" VND");
+        txt_alltotalamount.setText(totalRevenue + " VNĐ");
 
         // Cập nhật biểu đồ
         LineDataSet lineDataSet = new LineDataSet(lineEntries, "Doanh thu theo thời gian");
@@ -150,13 +145,14 @@ public class Revenue extends AppCompatActivity {
         lineChart.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM); // Đặt trục X ở phía dưới
         lineChart.invalidate(); // Cập nhật biểu đồ
 
-        // Cập nhật RecyclerView
+        // Cập nhật RecyclerView với danh sách đã lọc
         if (adapter_revanue != null) {
             adapter_revanue.clearData(); // Xóa dữ liệu cũ từ RecyclerView (nếu đã có)
         }
-        adapter_revanue = new Adapter_revanue(orderItems);
+        adapter_revanue = new Adapter_revanue(filteredOrderItems); // Gán danh sách đã lọc vào adapter
         recyclerView.setAdapter(adapter_revanue);
     }
+
 
 
 }

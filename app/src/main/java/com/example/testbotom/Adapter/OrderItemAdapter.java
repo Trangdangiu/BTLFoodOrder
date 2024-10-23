@@ -5,7 +5,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -38,7 +37,6 @@ public class OrderItemAdapter extends RecyclerView.Adapter<OrderItemAdapter.Orde
 
         // Cập nhật trạng thái của checkbox dựa trên `isDelivery`
         holder.checkBox.setChecked(orderItem.isDelivery());
-
         // Thay đổi màu nền item layout dựa vào trạng thái của checkbox
         if (orderItem.isDelivery()) {
             holder.itemView.setBackgroundColor(Color.LTGRAY); // Màu xám

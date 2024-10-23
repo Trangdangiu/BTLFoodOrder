@@ -1,21 +1,18 @@
 package com.example.testbotom.user;
 
+import static android.app.PendingIntent.getActivity;
 import static java.security.AccessController.getContext;
 
+import android.content.Context;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Button;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.testbotom.Adapter.Adapter_History_User;
-import com.example.testbotom.Adapter.OrderItemAdapter;
 import com.example.testbotom.Database.Create_database;
 import com.example.testbotom.Database.OrderItem;
 import com.example.testbotom.R;
@@ -49,10 +46,39 @@ public class History_Order extends AppCompatActivity {
         loadOrderItems();
     }
 
+//    private void loadOrderItems() {
+//        orderItemList.clear(); // Xóa danh sách cũ
+//        // Lấy user_id từ SharedPreferences
+//        String userIdStr = getActivity().getSharedPreferences("UserPrefs", Context.MODE_PRIVATE).getString("user_id", "-1");
+//        int user_id= Integer.parseInt(userIdStr);
+//        // Lấy danh sách đơn hàng của user_id hiện tại
+//        orderItemList.addAll(db.getAllOrderItems(user_id)); // Cập nhật để lấy dữ liệu dựa theo user_id
+//
+//        orderAdapter = new Adapter_History_User(orderItemList); // Tạo adapter với dữ liệu mới
+//        recyclerView.setAdapter(orderAdapter); // Đặt adapter cho RecyclerView
+//    }
+
     private void loadOrderItems() {
         orderItemList.clear(); // Xóa danh sách cũ
-        orderItemList.addAll(db.getAllOrderItems()); // Lấy dữ liệu từ DB và thêm vào danh sách
-        orderAdapter = new Adapter_History_User(orderItemList); // Tạo adapter với dữ liệu mới
+
+        // Lấy user_id từ SharedPreferences
+        String userIdStr = this.getSharedPreferences("UserPrefs", Context.MODE_PRIVATE).getString("user_id", "-1");
+        int user_id;
+
+        // Kiểm tra và chuyển đổi userIdStr thành int
+        try {
+            user_id = Integer.parseInt(userIdStr);
+        } catch (NumberFormatException e) {
+            user_id = -1; // Giá trị mặc định nếu có lỗi trong việc chuyển đổi
+        }
+
+        // Lấy danh sách đơn hàng của user_id hiện tại
+        orderItemList.addAll(db.getAllOrderItems(user_id)); // Cập nhật để lấy dữ liệu dựa theo user_id
+
+        // Tạo adapter với dữ liệu mới
+        orderAdapter = new Adapter_History_User(orderItemList);
         recyclerView.setAdapter(orderAdapter); // Đặt adapter cho RecyclerView
     }
+
+
 }
