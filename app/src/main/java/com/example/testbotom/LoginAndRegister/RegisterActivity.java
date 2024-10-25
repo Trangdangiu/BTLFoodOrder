@@ -1,5 +1,7 @@
 package com.example.testbotom.LoginAndRegister;
 
+import static com.example.testbotom.user.OtpGenerator.generateOtp;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -15,12 +17,16 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.testbotom.Database.Create_database;
 import com.example.testbotom.R;
+import com.example.testbotom.user.OtpGenerator;
+import com.example.testbotom.user.SendEmailTask;
 
 public class RegisterActivity extends AppCompatActivity {
     private Create_database dbHelper;
-    private EditText editTextEmail, editTextPassword;
+    private EditText editTextEmail, editTextPassword, editTextOtp;
     private RadioGroup radioGroupRole;
-    private ImageView img_forgot_pass;
+    private  Button btn_cancel_register, buttonRegister;
+    private String generatedOtp;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -31,12 +37,10 @@ public class RegisterActivity extends AppCompatActivity {
         editTextEmail = findViewById(R.id.id_edit_emaildki);
         editTextPassword = findViewById(R.id.id_edit_passdki);
         radioGroupRole = findViewById(R.id.id_role);
-        Button buttonRegister = findViewById(R.id.id_btn_dki);
+        buttonRegister = findViewById(R.id.id_btn_dki);
+        btn_cancel_register = findViewById(R.id.id_btn_cancel);
+
         buttonRegister.setOnClickListener(view -> {
-            String email = editTextEmail.getText().toString();
-            String password = editTextPassword.getText().toString();
-
-
             // Kiểm tra người dùng đã chọn vai trò
             int selectedId = radioGroupRole.getCheckedRadioButtonId();
             if (selectedId == -1) {
@@ -44,19 +48,38 @@ public class RegisterActivity extends AppCompatActivity {
                 return;
             }
 
+            String email = editTextEmail.getText().toString();
+            String password = editTextPassword.getText().toString();
 
-            String role = ((RadioButton) findViewById(selectedId)).getText().toString();
-
-            if (dbHelper.registerUser(email, password, role)) {
-                Toast.makeText(RegisterActivity.this, "Đăng kí thành công", Toast.LENGTH_SHORT).show();
-                Intent intent1 = new Intent(RegisterActivity.this, LogginActivity.class);
-                startActivity(intent1);
-                finish(); // Đóng Activity đăng ký
-            } else {
-                Log.e("RegisterError", "Đăng ký thất bại cho username: " + email);
-                Toast.makeText(RegisterActivity.this, "Đăng Kí Thất Bại", Toast.LENGTH_SHORT).show();
+            if(email.isEmpty() || password.isEmpty()){
+                Toast.makeText(RegisterActivity.this, "Vui lòng nhập đầy đủ thông tin", Toast.LENGTH_SHORT).show();
+                return;
             }
+
+            // Nếu email hợp lệ, gửi Otp và điều hướng tới verifyOtpActivity
+            generatedOtp = generateOtp();
+            new SendEmailTask().execute(email,generatedOtp);
+            Toast.makeText(RegisterActivity.this, "Mã OTP đã được gửi qua email "+ email +" vui lòng kiểm tra hộp thư", Toast.LENGTH_SHORT).show();
+
+            // điều hướng
+            Intent intent = new Intent(RegisterActivity.this, VerifyOtpActivity.class);
+            intent.putExtra("action", "register");
+            intent.putExtra("otp", generatedOtp);
+            intent.putExtra("role", ((RadioButton) findViewById(selectedId)).getText().toString());
+            intent.putExtra("email", email);
+            intent.putExtra("password", password);startActivity(intent);
+            finish();
+        });
+
+        // Handle cancel button click event
+        btn_cancel_register.setOnClickListener(view -> {
+            Intent intent = new Intent(RegisterActivity.this, LogginActivity.class);
+            startActivity(intent);
+            finish();
         });
     }
 
+    private String generateOtp(){
+        return OtpGenerator.generateOtp();
+    }
 }

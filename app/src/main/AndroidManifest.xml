@@ -19,7 +19,7 @@
             android:name=".user.History_Order"
             android:exported="false" />
         <activity
-            android:name=".user.OTPVerification"
+            android:name=".user.OtpGenerator"
             android:exported="false" />
         <activity
             android:name=".user.Food_detail"
@@ -41,6 +41,9 @@
         <activity
             android:name=".LoginAndRegister.RegisterActivity"
             android:exported="false" />
+        <activity android:name=".LoginAndRegister.VerifyOtpActivity" />
+        <activity android:name=".LoginAndRegister.ForgotPassword" />
+        <activity android:name=".LoginAndRegister.ResetPassword" />
     </application>
 
 </manifest>

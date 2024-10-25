@@ -21,7 +21,7 @@ public class LogginActivity extends AppCompatActivity {
     private Create_database dbHelper;
     private EditText editTextEmail, editTextPassword;
     private Button btn_loggin;
-    private TextView txt_register;
+    private TextView txt_register,txt_forgot_pass;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +34,7 @@ public class LogginActivity extends AppCompatActivity {
         editTextPassword = findViewById(R.id.enter_password);
         btn_loggin = findViewById(R.id.btn_loggin);
         txt_register = findViewById(R.id.id_dangki);
+        txt_forgot_pass=findViewById(R.id.img_forgot_pass);
 
         // Sự kiện khi nhấn vào nút đăng ký
         txt_register.setOnClickListener(view -> {
@@ -86,6 +87,13 @@ public class LogginActivity extends AppCompatActivity {
             } else {
                 Toast.makeText(LogginActivity.this, "Tên người dùng hoặc mật khẩu không đúng !", Toast.LENGTH_SHORT).show();
             }
+        });
+
+
+        // if forgot password
+        txt_forgot_pass.setOnClickListener(view -> {
+            Intent intent = new Intent(LogginActivity.this, ForgotPassword.class);
+            startActivity(intent);
         });
     }
 }
