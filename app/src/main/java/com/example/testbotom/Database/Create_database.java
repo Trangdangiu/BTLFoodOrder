@@ -566,6 +566,25 @@ public class Create_database extends SQLiteOpenHelper {
 
 
 
+    //     Check user exist
+    public boolean checkUser(String email){
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.query(TABLE_USER, new String[]{"email"}, "email=?", new String[]{email}, null, null, null);
+        boolean userExist = (cursor.getCount() > 0);
+        cursor.close();
+        db.close();
+        return userExist;
+    }
+
+    public boolean updatePasswordByEmail(String email, String password){
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("password", password);
+
+        int rowAffected = db.update(TABLE_USER, values, "email = ?", new String[]{email});
+
+        return rowAffected > 0;
+    }
 
 }
 
