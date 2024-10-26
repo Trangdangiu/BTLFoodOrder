@@ -10,6 +10,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -26,7 +27,7 @@ public class RegisterActivity extends AppCompatActivity {
     private RadioGroup radioGroupRole;
     private  Button btn_cancel_register, buttonRegister;
     private String generatedOtp;
-
+    private TextView txt_dangki_dangnhap;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,7 +40,7 @@ public class RegisterActivity extends AppCompatActivity {
         radioGroupRole = findViewById(R.id.id_role);
         buttonRegister = findViewById(R.id.id_btn_dki);
         btn_cancel_register = findViewById(R.id.id_btn_cancel);
-
+        txt_dangki_dangnhap=findViewById(R.id.id_dangki);
         buttonRegister.setOnClickListener(view -> {
             // Kiểm tra người dùng đã chọn vai trò
             int selectedId = radioGroupRole.getCheckedRadioButtonId();

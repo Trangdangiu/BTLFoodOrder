@@ -16,6 +16,9 @@
         android:theme="@style/Theme.Testbotom"
         tools:targetApi="31">
         <activity
+            android:name=".LoginAndRegister.Splash_Screen"
+            android:exported="false" />
+        <activity
             android:name=".user.History_Order"
             android:exported="false" />
         <activity
@@ -27,6 +30,8 @@
         <activity
             android:name=".admin.Revenue"
             android:exported="false" />
+
+
         <activity
             android:name=".LoginAndRegister.LogginActivity"
             android:exported="true">
@@ -36,6 +41,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity android:name=".admin.MainAdmin" />
         <activity android:name=".user.MainUser" />
         <activity

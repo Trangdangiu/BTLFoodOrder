@@ -13,17 +13,17 @@
 
         <ImageView
             android:id="@+id/image_ic_back"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:srcCompat="@drawable/ic_backactivity"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            app:srcCompat="@drawable/return_back"
             android:layout_marginRight="275dp"
             />
 
-        <ImageView
-            android:id="@+id/img_cart"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            app:srcCompat="@drawable/ic_cart" />
+<!--        <ImageView-->
+<!--            android:id="@+id/img_cart"-->
+<!--            android:layout_width="30dp"-->
+<!--            android:layout_height="30dp"-->
+<!--            app:srcCompat="@drawable/ic_cart" />-->
     </LinearLayout>
 
     <ImageView
@@ -62,10 +62,10 @@
         android:text="Mô tả"
         android:layout_weight="1"/>
 
-    <FrameLayout
-        android:id="@+id/fragment_container"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+<!--    <FrameLayout-->
+<!--        android:id="@+id/fragment_container"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content" />-->
     <Button
         android:id="@+id/btn_cart"
         android:layout_width="match_parent"

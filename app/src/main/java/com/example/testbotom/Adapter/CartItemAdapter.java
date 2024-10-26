@@ -23,7 +23,7 @@ public class CartItemAdapter extends BaseAdapter {
     private List<CartItem> cartItems;
     private Create_database db;
     private OnTotalItemsChangeListener totalItemsChangeListener;
-
+    // contextLuwuu tru ngu canh de truy cap cac tai nguyen va hien thi thong bao
     public CartItemAdapter(Context context, List<CartItem> cartItems) {
         this.context = context;
         this.cartItems = cartItems;
@@ -46,7 +46,7 @@ public class CartItemAdapter extends BaseAdapter {
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(int position, View convertView, ViewGroup parent) { //tuy chinh tung muc trong listview dua vao itemcart
         if (convertView == null) {
             convertView = LayoutInflater.from(context).inflate(R.layout.item_cart, parent, false);
         }

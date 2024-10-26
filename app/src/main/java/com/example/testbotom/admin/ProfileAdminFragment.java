@@ -1,6 +1,8 @@
 package com.example.testbotom.admin;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AlertDialog;
@@ -20,7 +22,7 @@ import com.example.testbotom.R;
 
 
 public class ProfileAdminFragment extends Fragment {
-    TextView txt_revenue,txt_change_pass,txt_logout;
+    TextView txt_revenue,txt_change_pass,txt_logout,txt_profile_show;
 
     private Create_database database;
     @Override
@@ -30,7 +32,11 @@ public class ProfileAdminFragment extends Fragment {
         txt_revenue=view.findViewById(R.id.txt_revenue);
         txt_change_pass=view.findViewById(R.id.txt_changepass_admin);
         txt_logout=view.findViewById(R.id.txt_logout_admin);
+        txt_profile_show=view.findViewById(R.id.txt_admin_show);
         database = new Create_database(getContext());
+        SharedPreferences sharedPreferences = getContext().getSharedPreferences("UserPrefs", Context.MODE_PRIVATE);
+        String currentEmail = sharedPreferences.getString("user_email", null);
+        txt_profile_show.setText(currentEmail);
         txt_revenue.setOnClickListener(v -> {
             showRevenue();
         });

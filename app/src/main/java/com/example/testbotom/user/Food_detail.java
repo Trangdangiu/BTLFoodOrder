@@ -41,7 +41,7 @@ public class Food_detail extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_food_detail);
 
-        img_backto_cart = findViewById(R.id.img_cart);
+//        img_backto_cart = findViewById(R.id.img_cart);
         btn_add_cart = findViewById(R.id.btn_cart);
         foodName = findViewById(R.id.product_name);
         foodPrice = findViewById(R.id.product_price);
@@ -60,13 +60,13 @@ public class Food_detail extends AppCompatActivity {
         }else{
             userId=Integer.parseInt(userIdString);
         }
-        img_backto_cart.setOnClickListener(v -> {
-            Fragment fragment= new CartFragment();
-            FragmentTransaction transaction= getSupportFragmentManager().beginTransaction();
-            transaction.replace(R.id.fragment_container,fragment);
-//                transaction.addToBackStack(null);
-            transaction.commit();
-        });
+//        img_backto_cart.setOnClickListener(v -> {
+//            Fragment fragment= new CartFragment();
+//            FragmentTransaction transaction= getSupportFragmentManager().beginTransaction();
+//            transaction.replace(R.id.fragment_container,fragment);
+////                transaction.addToBackStack(null);
+//            transaction.commit();
+//        });
 
         image_ic_back.setOnClickListener(v -> {
             finish();

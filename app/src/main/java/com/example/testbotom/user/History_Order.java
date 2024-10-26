@@ -38,11 +38,10 @@ public class History_Order extends AppCompatActivity {
         btn_back.setOnClickListener(v -> {
             finish();
         });
-
         db = new Create_database(this);
         orderItemList = new ArrayList<>();
 
-        // Lấy dữ liệu từ cơ sở dữ liệu và hiển thị lên RecyclerView
+        // Lấy dữ liệu từ cơ sở dữ liệu và hiển thị lên lên rycyclerviewwwww
         loadOrderItems();
     }
 
@@ -65,11 +64,11 @@ public class History_Order extends AppCompatActivity {
         String userIdStr = this.getSharedPreferences("UserPrefs", Context.MODE_PRIVATE).getString("user_id", "-1");
         int user_id;
 
-        // Kiểm tra và chuyển đổi userIdStr thành int
+        // vì userid là chuỗi nên đổi về dạng int để so sánh
         try {
             user_id = Integer.parseInt(userIdStr);
         } catch (NumberFormatException e) {
-            user_id = -1; // Giá trị mặc định nếu có lỗi trong việc chuyển đổi
+            user_id = -1; // nếu lỗi id=-1 ,nhưng chắc không lỗi
         }
 
         // Lấy danh sách đơn hàng của user_id hiện tại
