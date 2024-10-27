@@ -45,17 +45,6 @@ public class History_Order extends AppCompatActivity {
         loadOrderItems();
     }
 
-//    private void loadOrderItems() {
-//        orderItemList.clear(); // Xóa danh sách cũ
-//        // Lấy user_id từ SharedPreferences
-//        String userIdStr = getActivity().getSharedPreferences("UserPrefs", Context.MODE_PRIVATE).getString("user_id", "-1");
-//        int user_id= Integer.parseInt(userIdStr);
-//        // Lấy danh sách đơn hàng của user_id hiện tại
-//        orderItemList.addAll(db.getAllOrderItems(user_id)); // Cập nhật để lấy dữ liệu dựa theo user_id
-//
-//        orderAdapter = new Adapter_History_User(orderItemList); // Tạo adapter với dữ liệu mới
-//        recyclerView.setAdapter(orderAdapter); // Đặt adapter cho RecyclerView
-//    }
 
     private void loadOrderItems() {
         orderItemList.clear(); // Xóa danh sách cũ
