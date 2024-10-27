@@ -57,6 +57,11 @@ public class RegisterActivity extends AppCompatActivity {
                 return;
             }
 
+            // check formmat
+            if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                Toast.makeText(this, "Email không hợp lệ", Toast.LENGTH_SHORT).show();
+                return;
+            }
             // Nếu email hợp lệ, gửi Otp và điều hướng tới verifyOtpActivity
             generatedOtp = generateOtp();
             new SendEmailTask().execute(email,generatedOtp);

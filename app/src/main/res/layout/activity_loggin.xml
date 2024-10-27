@@ -115,7 +115,7 @@
         android:layout_height="wrap_content"
         android:backgroundTint="#F4511E"
         android:text="@string/btn_dangnhap"
-        android:textColor="#212121"
+        android:textColor="@color/white"
         app:icon="@drawable/ic_login"
         app:layout_constraintBottom_toTopOf="@+id/guideline"
         app:layout_constraintEnd_toEndOf="parent"

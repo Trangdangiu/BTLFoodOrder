@@ -14,6 +14,9 @@ public class User {
         this.role = role;
     }
 
+    public User() {
+    }
+
     // Getters and Setters
     public int getId() {
         return user_id;

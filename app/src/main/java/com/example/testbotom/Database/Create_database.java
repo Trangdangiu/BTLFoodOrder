@@ -118,7 +118,7 @@ public class Create_database extends SQLiteOpenHelper {
     }
 
     // Đăng nhập người dùng
-    public String loginUser(String email, String password) {
+    public String loginUserCheckPass(String email, String password) {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.query(TABLE_USER, new String[]{"role"}, "email=? AND password=?",
                 new String[]{email, password}, null, null, null);
@@ -130,6 +130,57 @@ public class Create_database extends SQLiteOpenHelper {
         db.close();
         return role; // Trả về vai trò người dùng (Admin hoặc User)
     }
+
+
+    // Get Role
+    public String getRoleByEmail(String email) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.query(TABLE_USER, new String[]{"role"}, "email=?",
+                new String[]{email}, null, null, null);
+        String role = null;
+        if (cursor.moveToFirst()) {
+            role = cursor.getString(0); // Lấy loại người dùng
+        }
+        cursor.close();
+        db.close();
+        return role; // Trả về vai trò người dùng (Admin hoặc User)
+    }
+    public boolean loginUser(String email, String password) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.query(TABLE_USER, new String[]{"email, password"}, "email=? AND password = ?",
+                new String[]{email, password}, null, null, null);
+        boolean success = (cursor.getCount() > 0);
+        cursor.close();
+        db.close();
+        return success; // Trả về vai trò người dùng (Admin hoặc User)
+    }
+
+    public User getUserByEmail(String email) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_USER + " WHERE email=?", new String[]{email});
+        User user = null;
+
+        // Kiểm tra nếu Cursor không rỗng và di chuyển thành công đến hàng đầu tiên
+        if (cursor != null && cursor.moveToFirst()) {
+            user = new User();
+
+            int idIndex = cursor.getColumnIndex("user_id");
+            int emailIndex = cursor.getColumnIndex("email");
+            int roleIndex = cursor.getColumnIndex("role");
+            int passwordIndex = cursor.getColumnIndex("password");
+
+            if (idIndex != -1) user.setId(cursor.getInt(idIndex));
+            if (emailIndex != -1) user.setEmail(cursor.getString(emailIndex));
+            if (roleIndex != -1) user.setRole(cursor.getString(roleIndex));
+            if(passwordIndex != -1) user.setPassword(cursor.getString(passwordIndex));
+        }
+
+        if (cursor != null) {
+            cursor.close(); // Đóng Cursor nếu nó đã được khởi tạo
+        }
+        return user; // Trả về đối tượng User hoặc null nếu không tìm thấy
+    }
+
 
     @SuppressLint("Range")
     public Integer getUserIdByEmail(String email) {

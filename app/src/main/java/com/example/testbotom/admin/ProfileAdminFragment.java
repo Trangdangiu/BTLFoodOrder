@@ -17,6 +17,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.testbotom.Database.Create_database;
+import com.example.testbotom.Database.User;
 import com.example.testbotom.LoginAndRegister.LogginActivity;
 import com.example.testbotom.R;
 
@@ -74,8 +75,7 @@ public class ProfileAdminFragment extends Fragment {
             String newPassword=editnewPass.getText().toString().trim();
 
 
-            if(oldPassword.isEmpty()||newPassword.isEmpty()){
-                Toast.makeText(getContext(), "Vui lòng điền đầy đủ thông tin", Toast.LENGTH_SHORT).show();
+            if(oldPassword.isEmpty()||newPassword.isEmpty()){Toast.makeText(getContext(), "Vui lòng điền đầy đủ thông tin", Toast.LENGTH_SHORT).show();
                 return;
             }
 
@@ -93,15 +93,20 @@ public class ProfileAdminFragment extends Fragment {
 
 
     private boolean changePassword(String oldPassword, String newPassword) {
-        // Kiểm tra mật khẩu cũ có đúng không
-//        String currentUsername = getCurrentUsername();
-        String currentRole = database.loginUser("current_username", oldPassword); // Giả định bạn có username hiện tại
-        if (currentRole != null) {
-            // Cập nhật mật khẩu mới vào cơ sở dữ liệu
-            // Cần thêm hàm để cập nhật mật khẩu trong Create_database
-            return database.updatePassword("current_username", newPassword); // Cập nhật mật khẩu mới
+        boolean checkChange = false;
+        // Lấy email người dùng hiện tại từ SharedPreferences lưu trũ ở login
+        SharedPreferences sharedPreferences = getContext().getSharedPreferences("UserPrefs", Context.MODE_PRIVATE);
+        String currentEmail = sharedPreferences.getString("user_email", "Không tìm thấy email");
+        User userExist = database.getUserByEmail(currentEmail);
+        if(oldPassword.equals(userExist.getPassword())){
+            // update pass word
+            database.updatePassword(currentEmail, newPassword);
+            checkChange = true;
+        } else {
+            Toast.makeText(getContext(), "Mật khẩu cũ không đúng", Toast.LENGTH_SHORT).show();
         }
-        return false; // Nếu mật khẩu cũ không đúng
+
+        return checkChange; // Nếu mật khẩu cũ không đúng
     }
 
 

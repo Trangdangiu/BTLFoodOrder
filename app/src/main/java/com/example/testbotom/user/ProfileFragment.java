@@ -17,6 +17,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.testbotom.Database.Create_database;
+import com.example.testbotom.Database.User;
 import com.example.testbotom.LoginAndRegister.LogginActivity;
 import com.example.testbotom.R;
 
@@ -83,16 +84,22 @@ public class ProfileFragment extends Fragment {
     }
 
     // đổi mật khẩu
+    // đổi mật khẩu
     private boolean changePassword(String oldPassword, String newPassword) {
+        boolean checkChange = false;
         // Lấy email người dùng hiện tại từ SharedPreferences lưu trũ ở login
         SharedPreferences sharedPreferences = getContext().getSharedPreferences("UserPrefs", Context.MODE_PRIVATE);
-        String currentEmail = sharedPreferences.getString("user_email", null);
-        String currentRole = database.loginUser(currentEmail, oldPassword);
-
-        if (currentRole != null) {
-            return database.updatePassword(currentEmail, newPassword); // Cập nhật mật khẩu mới
+        String currentEmail = sharedPreferences.getString("user_email", "Không tìm thấy email");
+        User userExist = database.getUserByEmail(currentEmail);
+        if(oldPassword.equals(userExist.getPassword())){
+            // update pass word
+            database.updatePassword(currentEmail, newPassword);
+            checkChange = true;
+        } else {
+            Toast.makeText(getContext(), "Mật khẩu cũ không đúng", Toast.LENGTH_SHORT).show();
         }
-        return false; // Nếu mật khẩu cũ không đúng
+
+        return checkChange; // Nếu mật khẩu cũ không đúng
     }
 
     // logout

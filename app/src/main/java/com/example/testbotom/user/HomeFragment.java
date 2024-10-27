@@ -159,6 +159,7 @@ public class HomeFragment extends Fragment {
             if (food.getName().toLowerCase().contains(query.toLowerCase())) {
                 filteredFoodList.add(food);
             }
+
         }
 
         // Cập nhật lại RecyclerView sau khi lọc

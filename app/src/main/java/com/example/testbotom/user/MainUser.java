@@ -30,7 +30,6 @@ public class MainUser extends AppCompatActivity {
          bottomNavigationView.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
              @Override
              public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-
                 // getting  Menuitem id in a variable
                   int id=item.getItemId();
                   // if else if statement for fragment;
